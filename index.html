@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Garuda and Amrita</title>
+  <meta name="description" content="An interactive illustrated retelling of Garuda's quest for Amrita, the nectar of immortality.">
+  <meta name="theme-color" content="#8FB6E8">
+  <link rel="icon" href="assets/ui/lotus-mark.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/literata-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/yatra-one-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#passage">Skip to the story text</a>
+
+  <main id="app" class="app" data-state="loading">
+    <section class="story" aria-labelledby="story-heading">
+      <h1 id="story-heading" class="masthead">
+        <img src="assets/ui/lotus-mark.svg" alt="" width="34" height="31">
+        <span>Garuda and Amrita</span>
+      </h1>
+
+      <!-- The illustrated world. Purely decorative: each scene is described in text inside the passage. -->
+      <div class="stage" id="stage" aria-hidden="true">
+        <div class="sky"></div>
+        <div class="layer" data-layer="sky"></div>
+        <div class="layer" data-layer="far"></div>
+        <div class="haze haze-far"></div>
+        <div class="layer" data-layer="back"></div>
+        <div class="haze haze-back"></div>
+        <div class="layer" data-layer="main"></div>
+        <div class="layer cast" data-layer="cast"></div>
+        <div class="layer" data-layer="fore"></div>
+        <canvas class="particles"></canvas>
+        <div class="birds">
+          <svg class="bird" viewBox="0 0 60 24" width="44" height="18"><path d="M2,16 Q16,2 30,14 Q44,2 58,16" fill="none" stroke="#352C36" stroke-width="3.5" stroke-linecap="round"/></svg>
+          <svg class="bird" viewBox="0 0 60 24" width="30" height="12"><path d="M2,16 Q16,2 30,14 Q44,2 58,16" fill="none" stroke="#352C36" stroke-width="3.5" stroke-linecap="round"/></svg>
+          <svg class="bird" viewBox="0 0 60 24" width="36" height="15"><path d="M2,16 Q16,2 30,14 Q44,2 58,16" fill="none" stroke="#352C36" stroke-width="3.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="light glow"></div>
+        <div class="light grade"></div>
+        <div class="rays"></div>
+        <div class="wind"></div>
+        <div class="fx">
+          <div class="fx-light"></div>
+          <div class="fx-veil"></div>
+          <img class="fx-mandala" src="assets/decorative/lotus-mandala.svg" alt="">
+          <img class="fx-cloud" src="assets/decorative/t-cloud.svg" alt="" style="left:10%">
+          <img class="fx-cloud" src="assets/decorative/t-cloud.svg" alt="" style="left:85%">
+          <img class="fx-cloud" src="assets/decorative/t-cloud.svg" alt="" style="left:40%">
+          <img class="fx-cloud" src="assets/decorative/t-cloud.svg" alt="" style="left:65%">
+          <img class="fx-cloud" src="assets/decorative/t-cloud.svg" alt="" style="left:25%">
+          <img class="fx-cloud" src="assets/decorative/t-cloud.svg" alt="" style="left:95%">
+          <img class="fx-cloud" src="assets/decorative/t-cloud.svg" alt="" style="left:0%">
+          <img class="fx-cloud" src="assets/decorative/t-cloud.svg" alt="" style="left:55%">
+          <img class="fx-branch fx-branch-a" src="assets/decorative/t-branch.svg" alt="">
+          <img class="fx-branch fx-branch-b" src="assets/decorative/t-branch.svg" alt="">
+          <div class="fx-streaks"></div>
+        </div>
+        <div class="frame">
+          <div class="frame-strip frame-top"><i class="lines"></i><i class="motif"></i></div>
+          <div class="frame-strip frame-bottom"><i class="lines"></i><i class="motif"></i></div>
+          <div class="frame-strip frame-left"><i class="lines"></i><i class="motif"></i></div>
+          <div class="frame-strip frame-right"><i class="lines"></i><i class="motif"></i></div>
+          <img class="frame-corner corner-tl" src="assets/decorative/corner.svg" alt="">
+          <img class="frame-corner corner-tr" src="assets/decorative/corner.svg" alt="">
+          <img class="frame-corner corner-bl" src="assets/decorative/corner.svg" alt="">
+          <img class="frame-corner corner-br" src="assets/decorative/corner.svg" alt="">
+        </div>
+      </div>
+
+      <!-- The current narrative passage. The text comes from story.json. -->
+      <article class="passage" id="passage" tabindex="-1" aria-live="polite" aria-atomic="true">
+        <p class="chapter"></p>
+        <h2 class="passage-title"></h2>
+        <p class="passage-text"></p>
+        <p class="final-line" hidden></p>
+        <p class="scene-desc visually-hidden"></p>
+      </article>
+
+      <nav class="controls" aria-label="Story navigation">
+        <button type="button" class="nav-button" data-command="prev" aria-label="Previous passage" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" /></svg>
+        </button>
+        <div class="progress">
+          <ol class="progress-list" aria-label="Passages"></ol>
+          <p class="counter" aria-hidden="true">01 / 20</p>
+        </div>
+        <button type="button" class="nav-button nav-next" data-command="next" aria-label="Next passage">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+        </button>
+        <button type="button" class="restart-button" data-command="restart" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v5h5" /></svg>
+          Experience the story again
+        </button>
+      </nav>
+
+      <div class="toolbar" role="group" aria-label="Display settings">
+        <p class="key-hint" id="key-hint"><kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> to turn the page</p>
+        <button type="button" class="tool" data-toggle="motion" aria-pressed="false">Motion: <span class="toggle-state">Full</span></button>
+        <button type="button" class="tool" data-toggle="parallax" aria-pressed="true">Parallax: <span class="toggle-state">On</span></button>
+        <button type="button" class="tool" data-open="about" aria-haspopup="dialog">About</button>
+      </div>
+    </section>
+
+    <!-- Opening screen -->
+    <section class="intro" id="intro" aria-labelledby="intro-title">
+      <div class="intro-card">
+        <img class="intro-reveal intro-mark" src="assets/ui/lotus-mark.svg" alt="" width="70" height="64">
+        <h2 class="intro-title intro-reveal" id="intro-title">Garuda and Amrita</h2>
+        <p class="intro-subtitle intro-reveal"></p>
+        <p class="intro-text intro-reveal"></p>
+        <button type="button" class="start-button intro-reveal" data-command="start">Start the story</button>
+        <p class="intro-hint intro-reveal">Use the arrow keys, Space or the on-screen buttons to move through 20 illustrated passages.</p>
+      </div>
+    </section>
+
+    <!-- Loading and error states -->
+    <div class="status status-loading" id="loading" role="status">
+      <svg class="loader" viewBox="0 0 100 100" aria-hidden="true">
+        <g fill="none" stroke-width="5" stroke-linecap="round">
+          <path class="loader-petal" d="M50 82 C30 64 32 36 50 18 C68 36 70 64 50 82Z" stroke="#C95038"/>
+          <path class="loader-petal" d="M50 82 C26 74 14 52 18 34 C36 40 48 60 50 82Z" stroke="#E987A5"/>
+          <path class="loader-petal" d="M50 82 C74 74 86 52 82 34 C64 40 52 60 50 82Z" stroke="#E6AD38"/>
+        </g>
+      </svg>
+      <p>Gathering the story…</p>
+    </div>
+
+    <div class="status status-error" id="error" role="alert">
+      <h2>The story could not begin</h2>
+      <p class="error-message"></p>
+      <p class="error-detail"></p>
+      <button type="button" id="retry" class="start-button">Try again</button>
+    </div>
+
+    <dialog class="about-dialog" id="about" aria-labelledby="about-title">
+      <h2 id="about-title">About this retelling</h2>
+      <div class="about-body"></div>
+      <h3>How to navigate</h3>
+      <ul>
+        <li><kbd>→</kbd>, <kbd>Space</kbd> or <kbd>Page Down</kbd>: next passage</li>
+        <li><kbd>←</kbd> or <kbd>Page Up</kbd>: previous passage</li>
+        <li><kbd>Home</kbd> / <kbd>End</kbd>: first / last passage</li>
+        <li>Choose any lotus bud in the progress bar to jump to that passage.</li>
+      </ul>
+      <button type="button" class="dialog-close start-button">Close</button>
+    </dialog>
+
+    <noscript><p class="noscript">This illustrated story needs JavaScript to load its passages.</p></noscript>
+  </main>
+
+  <script src="vendor/gsap.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
